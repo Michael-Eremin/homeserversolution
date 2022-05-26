@@ -1,15 +1,17 @@
-from .views import get_news
-from .views import NewsLinkViewSet
+from newscreation.views import get_news
+from newscreation.views import NewsLinkViewSet
 from rest_framework.routers import SimpleRouter
-from django.urls import path
+from django.urls import URLPattern, path
 
+
+# URLs to get data in 'json' format.
 router = SimpleRouter()
 router.register(r'news', NewsLinkViewSet)
+urlpatterns = router.urls
 
 
-urlpatterns = [
-    path('n/', get_news),
-]
-
-urlpatterns += router.urls
-
+# URLs to get templates 'html'.
+# urlpatterns = [
+#     path('___/', _____),
+# ]
+# urlpatterns += router.urls

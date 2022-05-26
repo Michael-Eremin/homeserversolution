@@ -1,22 +1,16 @@
 from django.db import models
 from django.core.validators import URLValidator
-from django.urls import reverse
 from .datasite import get_list_data
 
-# Create your models here.
+
 class Category(models.Model):
     name = models.CharField(max_length=100, db_index=True, verbose_name='Категория', null=True)
     slug = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name="URL")
 
     def __str__(self):
+        """Outputs information about the 'category' by its 'name'."""
         return self.name
 
-    def get_absolute_url(self):
-        return reverse('category', kwargs={'cat_slug': self.slug})
-
-    class Meta:
-        verbose_name = 'Категории'
-        verbose_name_plural = 'Категории'
 
 class NewsLink(models.Model):
     title = models.CharField(max_length=255, verbose_name='Название новости')
@@ -29,32 +23,23 @@ class NewsLink(models.Model):
     source = models.CharField(max_length=255, verbose_name='Источник', null=True)
     cat = models.ForeignKey(Category, on_delete=models.PROTECT, verbose_name='Категория')
     
-    
     def __str__(self):
-         return self.title
+        """Outputs information about the 'news' by its 'title'."""
+        return self.title
 
-    def get_absolute_url(self):
-        return reverse('post', kwargs={'post_slug': self.slug})
-
-    class Meta:
-        verbose_name = 'Новости'
-        verbose_name_plural = 'Новости'
 
 def save_data_to_base():
+    """Saves the information received from web resources in the database."""
     data_list = get_list_data()
     for object in data_list:
+        # Checks and saves if there is no such news in the database.
         if not NewsLink.objects.filter(title=object['title']).exists():
             data = NewsLink(**object)
             data.save()
             print(object['title'])
         
 
-   
-
-
+# WARNING. It is necessary to develop. Disconnect Save.
 a = 0
 if a == 1:
     save_data_to_base()
-
-
-

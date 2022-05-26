@@ -18,13 +18,18 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from newscreation.views import get_news
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/v1/', include('newscreation.urls')),
+    path('', get_news),
+    path('', include('newscreation.urls')),
+    
 ]
 urlpatterns +=static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 urlpatterns += staticfiles_urlpatterns()
+
 
 # if settings.DEBUG:
 #     import debug_toolbar
