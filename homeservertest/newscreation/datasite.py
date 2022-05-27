@@ -5,11 +5,10 @@ import requests
 from dateutil.parser import parse
 
 
-
 # News source:
-BIOLOGY = 'https://scitechdaily.com/news/biology/'
-PHYSICS = 'https://blogs.cardiff.ac.uk/physicsoutreach/'
 MATH = 'https://news.mit.edu/topic/mathematics/'
+PHYSICS = 'https://blogs.cardiff.ac.uk/physicsoutreach/'
+BIOLOGY = 'https://scitechdaily.com/news/biology/'
 
 
 # Type alias for variables
@@ -54,16 +53,10 @@ def make_format_date(date_text: str) -> str:
     return date_format
 
 
-def get_math_news() -> list[dict[str, str]]:
+def get_math_news(math_site_text: str) -> list[dict[str, str]]:
     """Gets data from a web resource."""
     math_news = []
-    rtext = requests.get(MATH).text
-    soup = BeautifulSoup(rtext, "lxml")
-    
-    # with open('/home/michael/code/scienceworldnews/scienceworldnews/news/templates/news/example_m.html') as fp:
-    #     soup = BeautifulSoup(fp, "lxml")
-
-    posts = soup.find_all("div", class_="page-term--views--list-item")
+    posts = math_site_text.find_all("div", class_="page-term--views--list-item")
     for post in posts:
        
         date_text = post.find("time").get_text().strip()
@@ -89,16 +82,10 @@ def get_math_news() -> list[dict[str, str]]:
     return math_news
 
 
-def get_physics_news() -> list[dict[str, str]]:
+def get_physics_news(physics_site_text: str) -> list[dict[str, str]]:
     """Gets data from a web resource."""
     physics_news = []
-    rtext = requests.get(PHYSICS).text
-    soup = BeautifulSoup(rtext, "lxml")
-
-    # with open('/home/michael/code/scienceworldnews/scienceworldnews/news/templates/news/example_p.html') as fp:
-    #     soup = BeautifulSoup(fp, "lxml")
-
-    posts = soup.find_all("article", "with-image")
+    posts = physics_site_text.find_all("article", "with-image")
     for post in posts:
        
         date_text = post.find("p", class_="teaser-date posted-on").a.get_text().strip()
@@ -124,16 +111,10 @@ def get_physics_news() -> list[dict[str, str]]:
     return physics_news
 
 
-def get_biology_news() -> list[dict[str, str]]:
+def get_biology_news(biology_site_text: str) -> list[dict[str, str]]:
     """Gets data from a web resource."""
     biology_news = []
-    rtext = requests.get(BIOLOGY).text
-    soup = BeautifulSoup(rtext, "lxml")
-
-    # with open('/home/michael/code/homeserversolution/homeservertest/newscreation/templates/newscreation/example_b.html') as fp:
-    #     soup = BeautifulSoup(fp, "lxml")
-
-    posts = soup.find_all("article", "content-list")
+    posts = biology_site_text.find_all("article", "content-list")
     for post in posts:
        
         date_text = post.find("span", class_="entry-meta-date updated").get_text().strip()
@@ -141,7 +122,8 @@ def get_biology_news() -> list[dict[str, str]]:
         title = post.find("a").get("title").strip()
         description = post.find('div', class_="content-list-excerpt").get_text().strip()
         content_link = post.find("a").get("href")
-        img_link = post.find("div", class_="content-thumb content-list-thumb").a.img.get("src")
+        # get("data-ezsrc") or get("src")?
+        img_link = post.find("div", class_="content-thumb content-list-thumb").a.img.get("data-ezsrc")
         img_path = convert_to_path(img_link, 'biology')
         save_image(img_link, img_path)
         source = get_source(content_link)
@@ -157,13 +139,25 @@ def get_biology_news() -> list[dict[str, str]]:
                 }
         biology_news.append(data)
     return biology_news
-        
-        
+
+
+def get_text_site(web_source: url) -> str:
+    """Gets text from a website page"""
+    rtext = requests.get(web_source).text
+    soup = BeautifulSoup(rtext, "lxml")
+    return soup
+
+
 def get_list_data() -> list[dict[str, str]]:
     """Starts the data retrieval functions."""
-    math_list = get_math_news()
-    physics_list = get_physics_news()
-    biology_list = get_biology_news()
+    math_site_text = get_text_site(MATH)
+    physics_site_text = get_text_site(PHYSICS)
+    biology_site_text = get_text_site(BIOLOGY)
+
+    math_list = get_math_news(math_site_text)
+    physics_list = get_physics_news(physics_site_text)
+    biology_list = get_biology_news(biology_site_text)
+
     news_list = math_list + physics_list + biology_list
     return news_list
     

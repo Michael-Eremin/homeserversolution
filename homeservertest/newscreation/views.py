@@ -7,6 +7,7 @@ from rest_framework import viewsets
 class NewsLinkViewSet(viewsets.ModelViewSet):
     """View data sorted by descending date and category. The first 11 items from the database. Format 'json'."""
     queryset = NewsLink.objects.all().order_by('-date_published', 'cat')[:11]
+    # queryset = NewsLink.objects.filter(cat_id=2).order_by('-date_published')[:11]
     serializer_class = NewsLinkSerializer
 
 

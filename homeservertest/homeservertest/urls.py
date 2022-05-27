@@ -23,7 +23,7 @@ from newscreation.views import get_news
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', get_news),
+    path('', get_news, name='main'),
     path('', include('newscreation.urls')),
     
 ]
